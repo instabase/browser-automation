@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instabase Browser Agent</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+            width: 90%;
+            height: 90vh;
+            text-align: center;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .settings-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            color: #666;
+            transition: color 0.3s ease;
+            z-index: 10;
+        }
+
+        .settings-icon:hover {
+            color: #333;
+        }
+
+        .input-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            margin-bottom: 24px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff;
+            border: 1px solid #e1e1e1;
+            border-radius: 12px;
+            padding: 0;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            min-height: 120px;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: #1976d2;
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.15);
+        }
+
+        .input-header {
+            padding: 4px 16px 2px 16px;
+        }
+
+        textarea {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 16px 20px;
+            font-size: 14px;
+            background: transparent;
+            color: #1a1a1a;
+            resize: none;
+            min-height: 100px;
+            line-height: 1;
+            font-family: inherit;
+        }
+
+        textarea:focus {
+            outline: none;
+        }
+
+        textarea::placeholder {
+            color: #9ca3af;
+            font-style: italic;
+        }
+
+        .input-footer {
+            padding: 12px 16px;
+            border-top: 1px solid #f0f0f0;
+            background-color: #fafafa;
+            border-radius: 0 0 12px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .footer-options {
+            display: flex;
+            gap: 8px;
+        }
+
+        .settings-icon-footer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: transparent;
+            border: 1px solid #e1e1e1;
+            border-radius: 8px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .settings-icon-footer:hover {
+            background-color: #f0f0f0;
+            border-color: #d1d5db;
+        }
+
+        .settings-icon-footer svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .submit-btn-footer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: #1976d2;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(25, 118, 210, 0.2);
+        }
+
+        .submit-btn-footer:hover {
+            background-color: #1565c0;
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(25, 118, 210, 0.3);
+        }
+
+        .submit-btn-footer svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .stop-btn-footer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: #dc3545;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
+        }
+
+        .stop-btn-footer:hover {
+            background-color: #c82333;
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+        }
+
+        .stop-btn-footer svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .submit-btn-footer:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .logo {
+            width: 120px;
+            height: 60px;
+            margin: 0 auto 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        h1 {
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 32px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .submit-icon {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+
+        .submit-icon:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-icon:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+            line-height: 1.5;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.loading {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .example-tasks {
+            margin-top: 32px;
+            text-align: left;
+        }
+
+        .example-tasks h3 {
+            color: #1a1a1a;
+            margin-bottom: 16px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .example-task {
+            background: #f8f9fa;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #e9ecef;
+        }
+
+        .example-task:hover {
+            background: #e9ecef;
+            border-color: #dee2e6;
+            transform: translateY(-1px);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 32px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #e1e5e9;
+            padding-bottom: 16px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .close {
+            color: #666;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .close:hover {
+            color: #333;
+            background-color: #f8f9fa;
+        }
+
+        .settings-section {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding: 12px 0;
+        }
+
+        .form-row label {
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 0;
+            flex: 1;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .form-row input[type="text"],
+        .form-row input[type="number"],
+        .form-row select {
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s ease;
+            height: 44px;
+            box-sizing: border-box;
+            background-color: #ffffff;
+        }
+
+        .form-row input[type="text"]:focus,
+        .form-row input[type="number"]:focus,
+        .form-row select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .toggle-button {
+            width: 80px;
+            height: 40px;
+            background-color: #667eea;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            outline: none;
+        }
+
+        .toggle-button.off {
+            background-color: #e1e5e9;
+        }
+
+        .toggle-text {
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            user-select: none;
+        }
+
+        .toggle-button.off .toggle-text {
+            color: #666;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #e1e5e9;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #666;
+            border: 1px solid #e1e5e9;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="resources/images/instabase-logo.png" alt="Instabase Logo">
+        </div>
+        <h1>Instabase Browser Agent</h1>
+        <p class="subtitle">Enter your task and let AI handle the browser automation</p>
+        
+        <div class="input-container">
+            <div class="input-wrapper">
+                <div class="input-header">
+                </div>
+                <textarea 
+                    id="taskInput" 
+                    placeholder="Describe the task you want the AI to perform in the browser..."
+                    required
+                ></textarea>
+                <div class="input-footer">
+                    <div class="footer-options">
+                        <button type="button" class="settings-icon-footer" onclick="openSettings()">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.22,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.22,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/>
+                        </svg>
+                        </button>
+                    </div>
+                    <button type="button" class="submit-btn-footer" id="submitBtn" onclick="submitTask()" style="position: absolute; right: 12px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="stop-btn-footer" id="stopBtn" onclick="stopTask()" style="display: none; position: absolute; right: 12px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M6,6h12v12H6z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="status" class="status"></div>
+
+        <div class="example-tasks">
+            <h3>Example Tasks:</h3>
+            <div class="example-task" onclick="setExampleTask(0)">
+                Go to kayak.com and find the cheapest flight between San Francisco and New York for July 18th
+            </div>
+            <div class="example-task" onclick="setExampleTask(1)">
+                Search for the latest iPhone on Amazon and add it to cart
+            </div>
+            <div class="example-task" onclick="setExampleTask(2)">
+                Go to weather.com and check the weather forecast for New York City
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Configuration Settings</h2>
+                <span class="close" onclick="closeSettings()">&times;</span>
+            </div>
+            <div class="settings-section">
+                <h3 class="section-title">Agent Settings</h3>
+                <div class="form-row">
+                    <label for="highlightElements">Highlight Elements:</label>
+                    <button type="button" class="toggle-button" id="highlightElementsToggle" onclick="toggleHighlight()">
+                        <span class="toggle-text" id="toggleText">On</span>
+                    </button>
+                </div>
+                <div class="form-row">
+                    <label for="maxAgentSteps">Max Agent Steps:</label>
+                    <input type="number" id="maxAgentSteps" value="100" min="1" max="1000">
+                </div>
+            </div>
+            <div class="settings-section">
+                <h3 class="section-title">LLM Settings</h3>
+                <div class="form-row">
+                    <label for="llmModel">Model:</label>
+                    <select id="llmModel">
+                        <option value="gemini-2.5-flash" selected>gemini-2.5-flash</option>
+                        <option value="gemini-2.0-flash">gemini-2.0-flash</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label for="apiKey">API_KEY:</label>
+                    <input type="text" id="apiKey" value="AIzaSyCoHZk45d6ZKM4AAUFCxZDRzEpY">
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeSettings()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveConfig()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        
+        const taskForm = document.getElementById('taskForm');
+        const taskInput = document.getElementById('taskInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const status = document.getElementById('status');
+        const settingsModal = document.getElementById('settingsModal');
+        const highlightElementsToggle = document.getElementById('highlightElementsToggle');
+        const maxAgentStepsInput = document.getElementById('maxAgentSteps');
+        const llmModelSelect = document.getElementById('llmModel');
+        const apiKeyInput = document.getElementById('apiKey');
+
+        let highlightElementsEnabled = true; // Track the state
+        let isTaskRunning = false; // Track if a task is currently running
+
+        const exampleTasks = [
+            "Go to kayak.com and find the cheapest flight between San Francisco and New York for July 18th",
+            "Search for the latest iPhone on Amazon and add it to cart",
+            "Go to weather.com and check the weather forecast for New York City"
+        ];
+
+        function setExampleTask(index) {
+            taskInput.value = exampleTasks[index];
+        }
+
+        function showStatus(message, type) {
+            status.textContent = message;
+            status.className = `status ${type}`;
+            status.style.display = 'block';
+        }
+
+        function hideStatus() {
+            status.style.display = 'none';
+        }
+
+        function toggleHighlight() {
+            highlightElementsEnabled = !highlightElementsEnabled;
+            updateToggleButton();
+        }
+
+        function updateToggleButton() {
+            const toggleButton = document.getElementById('highlightElementsToggle');
+            const toggleText = document.getElementById('toggleText');
+            
+            if (highlightElementsEnabled) {
+                toggleButton.classList.remove('off');
+                toggleText.textContent = 'On';
+            } else {
+                toggleButton.classList.add('off');
+                toggleText.textContent = 'Off';
+            }
+        }
+
+        // Settings Modal Functions
+        function openSettings() {
+            // Load current config
+            ipcRenderer.invoke('load-config').then(config => {
+                highlightElementsEnabled = config.highlightElements !== false; // default to true
+                maxAgentStepsInput.value = config.maxAgentSteps || 100;
+                llmModelSelect.value = config.llmModel || 'gemini-2.5-flash';
+                apiKeyInput.value = config.apiKey || 'AIzaSyCoHZk45d6ZKM4AAUFCxZDRzEpY';
+                updateToggleButton();
+                settingsModal.style.display = 'block';
+            }).catch(error => {
+                console.error('Error loading config:', error);
+                // Show default values
+                highlightElementsEnabled = true;
+                maxAgentStepsInput.value = 100;
+                llmModelSelect.value = 'gemini-2.5-flash';
+                apiKeyInput.value = 'AIzaSyCoHZk45d6ZKM4AAUFCxZDRzEpY';
+                updateToggleButton();
+                settingsModal.style.display = 'block';
+            });
+        }
+
+        function closeSettings() {
+            settingsModal.style.display = 'none';
+        }
+
+        function saveConfig() {
+            const config = {
+                highlightElements: highlightElementsEnabled,
+                maxAgentSteps: parseInt(maxAgentStepsInput.value),
+                llmModel: llmModelSelect.value,
+                apiKey: apiKeyInput.value
+            };
+
+            ipcRenderer.invoke('save-config', config).then(result => {
+                if (result.success) {
+                    showStatus('Configuration saved successfully!', 'success');
+                    closeSettings();
+                } else {
+                    showStatus('Error saving configuration: ' + result.error, 'error');
+                }
+            }).catch(error => {
+                showStatus('Error saving configuration: ' + error.message, 'error');
+            });
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target === settingsModal) {
+                closeSettings();
+            }
+        }
+
+        function submitTask() {
+            const task = taskInput.value.trim();
+            if (!task) {
+                showStatus('Please enter a task description', 'error');
+                return;
+            }
+
+            // Switch to stop button
+            isTaskRunning = true;
+            submitBtn.style.display = 'none';
+            stopBtn.style.display = 'flex';
+            taskInput.disabled = true;
+
+            hideStatus();
+            showStatus('Starting browser automation...', 'loading');
+
+            ipcRenderer.invoke('submit-task', task)
+                .then(result => {
+                    // Only show success if task wasn't stopped by user
+                    if (result.success && !result.stopped) {
+                        showStatus('Task completed successfully! Check the browser for results.', 'success');
+                    } else if (result.stopped) {
+                        // Task was stopped, don't show success message
+                        console.log('Task was stopped by user');
+                    } else {
+                        showStatus(`Error: ${result.error}`, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showStatus(`Error: ${error.message}`, 'error');
+                })
+                .finally(() => {
+                    // Switch back to submit button
+                    isTaskRunning = false;
+                    submitBtn.style.display = 'flex';
+                    stopBtn.style.display = 'none';
+                    taskInput.disabled = false;
+                });
+        }
+
+        function stopTask() {
+            // Send stop signal to main process
+            ipcRenderer.invoke('stop-task').then(() => {
+                showStatus('The task was abruptly stopped by the user.', 'error');
+                // Switch back to submit button
+                isTaskRunning = false;
+                submitBtn.style.display = 'flex';
+                stopBtn.style.display = 'none';
+                taskInput.disabled = false;
+            }).catch(error => {
+                showStatus(`Error stopping task: ${error.message}`, 'error');
+            });
+        }
+
+        // Auto-resize textarea
+        taskInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+        });
+    </script>
+</body>
+</html> 

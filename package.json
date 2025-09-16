@@ -1,0 +1,62 @@
+{
+  "name": "instabase-browser-agent",
+  "version": "1.0.0",
+  "description": "Instabase Browser Agent - Agentic Browser Automation",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "build:mac": "electron-builder --mac",
+    "pack": "electron-builder --dir"
+  },
+  "keywords": ["electron", "aihub", "browser-automation", "instabase"],
+  "author": "Anant Bhardwaj",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^26.0.12"
+  },
+  "dependencies": {
+    "python-shell": "^5.0.0"
+  },
+  "build": {
+    "appId": "com.instabase.browser-agent",
+    "productName": "Instabase Browser Agent",
+    "icon": "resources/images/instabase-logo.png",
+    "mac": {
+      "icon": "resources/images/instabase-logo.icns",
+      "category": "public.app-category.developer-tools"
+    },
+    "win": {
+      "icon": "resources/images/instabase-logo.png"
+    },
+    "linux": {
+      "icon": "resources/images/instabase-logo.png"
+    },
+    "files": [
+      "**/*",
+      "!dist/**/*",
+      "!build/**/*",
+      "!.venv/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": ".venv",
+        "to": ".venv"
+      },
+      {
+        "from": "browser_server.py",
+        "to": "browser_server.py"
+      },
+      {
+        "from": "requirements.txt",
+        "to": "requirements.txt"
+      }
+    ],
+    "asar": true,
+    "directories": {
+      "output": "dist"
+    }
+  }
+}
